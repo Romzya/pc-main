@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление комплектующими</title>
+</head>
+<body>
+    <h1>Управление комплектующими</h1>
+    <div>
+        <a href="{{ url_for('index') }}">Главная</a> | 
+        <a href="{{ url_for('admin_panel') }}">Админ-панель</a> |
+        <a href="{{ url_for('logout') }}">Выйти</a>
+    </div>
+
+    <h2>Добавить новое комплектующее</h2>
+    <form method="POST" action="{{ url_for('manage_components_page') }}">
+        <div>
+            <label>Категория:</label><br>
+            <select name="category" required>
+                <option value="">Выберите категорию</option>
+                <option value="Процессор">Процессор</option>
+                <option value="Материнская плата">Материнская плата</option>
+                <option value="Кулер">Кулер</option>
+                <option value="Оперативная память">Оперативная память</option>
+                <option value="Видеокарта">Видеокарта</option>
+                <option value="Блок питания">Блок питания</option>
+                <option value="Корпус">Корпус</option>
+            </select>
+        </div>
+        
+        <div>
+            <label>Название:</label><br>
+            <input type="text" name="name" required>
+        </div>
+        
+        <div>
+            <label>Описание:</label><br>
+            <textarea name="description" rows="3"></textarea>
+        </div>
+        
+        <div>
+            <label>Сокет (для процессоров и мат. плат):</label><br>
+            <input type="text" name="socket">
+        </div>
+        
+        <div>
+            <label>Цена (руб.):</label><br>
+            <input type="number" name="price" step="0.01" min="0" value="0">
+        </div>
+        
+        <br>
+        <button type="submit">Добавить комплектующее</button>
+    </form>
+
+    <h2>Список всех комплектующих</h2>
+    {% if components %}
+        {% for component in components %}
+        <div id="component-{{ component.id }}">
+            <!-- Режим просмотра -->
+            <div id="view-{{ component.id }}">
+                <strong>{{ component.name }}</strong> ({{ component.category }})<br>
+                Описание: {{ component.description or 'Нет' }}<br>
+                Сокет: {{ component.socket or 'Не указан' }}<br>
+                Цена: {{ "%.2f"|format(component.price) if component.price else "0.00" }} руб.<br>
+                <button onclick="startEdit({{ component.id }})">Редактировать</button>
+                <a href="{{ url_for('delete_component_by_id', component_id=component.id) }}" 
+                   onclick="return confirm('Удалить \"{{ component.name }}\"?')">
+                    Удалить
+                </a>
+            </div>
+            
+            <!-- Режим редактирования (скрыт по умолчанию) -->
+            <div id="edit-{{ component.id }}" style="display: none; border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                <form method="POST" action="{{ url_for('update_component') }}">
+                    <input type="hidden" name="id" value="{{ component.id }}">
+                    
+                    <div>
+                        <label>Категория:</label><br>
+                        <select name="category" required>
+                            <option value="">Выберите категорию</option>
+                            <option value="Процессор" {% if component.category == 'Процессор' %}selected{% endif %}>Процессор</option>
+                            <option value="Материнская плата" {% if component.category == 'Материнская плата' %}selected{% endif %}>Материнская плата</option>
+                            <option value="Кулер" {% if component.category == 'Кулер' %}selected{% endif %}>Кулер</option>
+                            <option value="Оперативная память" {% if component.category == 'Оперативная память' %}selected{% endif %}>Оперативная память</option>
+                            <option value="Видеокарта" {% if component.category == 'Видеокарта' %}selected{% endif %}>Видеокарта</option>
+                            <option value="Блок питания" {% if component.category == 'Блок питания' %}selected{% endif %}>Блок питания</option>
+                            <option value="Корпус" {% if component.category == 'Корпус' %}selected{% endif %}>Корпус</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>Название:</label><br>
+                        <input type="text" name="name" value="{{ component.name }}" required>
+                    </div>
+                    
+                    <div>
+                        <label>Описание:</label><br>
+                        <textarea name="description" rows="3">{{ component.description or '' }}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label>Сокет:</label><br>
+                        <input type="text" name="socket" value="{{ component.socket or '' }}">
+                    </div>
+                    
+                    <div>
+                        <label>Цена (руб.):</label><br>
+                        <input type="number" name="price" step="0.01" min="0" value="{{ component.price or 0 }}">
+                    </div>
+                    
+                    <br>
+                    <button type="submit">Сохранить</button>
+                    <button type="button" onclick="cancelEdit({{ component.id }})">Отмена</button>
+                </form>
+            </div>
+            <hr>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div>Нет комплектующих в базе данных</div>
+    {% endif %}
+
+    <script>
+        function startEdit(componentId) {
+            // Скрываем режим просмотра
+            document.getElementById('view-' + componentId).style.display = 'none';
+            // Показываем режим редактирования
+            document.getElementById('edit-' + componentId).style.display = 'block';
+        }
+        
+        function cancelEdit(componentId) {
+            // Показываем режим просмотра
+            document.getElementById('view-' + componentId).style.display = 'block';
+            // Скрываем режим редактирования
+            document.getElementById('edit-' + componentId).style.display = 'none';
+        }
+    </script>
+</body>
+</html>

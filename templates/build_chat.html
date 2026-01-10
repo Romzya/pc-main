@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат по сборке #{{ build.id }}</title>
+</head>
+<body>
+    <h1>Чат по сборке #{{ build.id }}</h1>
+    <div>
+        <a href="{{ url_for('index') }}">На главную</a> | 
+        {% if is_admin %}
+            <a href="{{ url_for('admin_panel') }}">Админ-панель</a> |
+        {% endif %}
+        <a href="javascript:history.back()">Назад</a>
+    </div>
+    
+    <div>
+        <h3>Информация о сборке:</h3>
+        <p><strong>Владелец:</strong> {{ build.username }}</p>
+        <p><strong>Процессор:</strong> {{ build.Proc }}</p>
+        <p><strong>Материнская плата:</strong> {{ build.MPlata }}</p>
+        <p><strong>Система охлаждения:</strong> {{ build.CW }}</p>
+        <p><strong>ОЗУ:</strong> {{ build.RAM }}</p>
+        <p><strong>Видеокарта:</strong> {{ build.VideoCard }}</p>
+        <p><strong>БП:</strong> {{ build.BP }}</p>
+        <p><strong>Корпус:</strong> {{ build.Corpus }}</p>
+        
+        {% if status and status.needs_approval == 1 %}
+        <div>
+            <strong>⚠️ Требуется согласование изменений</strong>
+            {% if is_admin %}
+            <form method="POST" action="{{ url_for('approve_build_changes', build_id=build.id) }}">
+                <button type="submit">✅ Согласовать изменения</button>
+            </form>
+            {% else %}
+            <p>Ожидание согласования администратором</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {% if not is_admin %}
+        <form method="POST" action="{{ url_for('request_build_edit', build_id=build.id) }}">
+            <textarea name="edit_request" rows="3" placeholder="Опишите какие изменения нужны..."></textarea><br>
+            <button type="submit">Запросить редактирование</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('edit_build', build_id=build.id) }}">Редактировать сборку</a>
+        {% endif %}
+    </div>
+    
+    <div>
+        <h3>Сообщения:</h3>
+        <div>
+            {% if messages %}
+                {% for msg in messages %}
+                <div>
+                    <div>
+                        <strong>
+                            {% if msg.is_admin == 1 %} {% endif %}
+                            {{ msg.username }}
+                            {% if msg.user_id == user_id %}(Вы){% endif %}
+                        </strong>
+                        <small>{{ msg.created_at }}</small>
+                    </div>
+                    <div>{{ msg.message }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Нет сообщений</p>
+            {% endif %}
+        </div>
+        
+        <form method="POST" action="{{ url_for('send_chat_message', build_id=build.id) }}">
+            <textarea name="message" rows="3" placeholder="Введите сообщение..." required></textarea><br>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+</body>
+</html>

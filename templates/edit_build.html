@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование сборки #{{ build.id }}</title>
+</head>
+<body>
+    <h1>Редактирование сборки #{{ build.id }}</h1>
+    
+    <h2>!Перед редактированием обязательно согласуйте с клиентом!</h2>
+
+    <a href="{{ url_for('admin_panel') }}">Назад к админ-панели</a>
+    
+    <form method="POST" action="{{ url_for('edit_build', build_id=build.id) }}">
+        <p><strong>Процессор:</strong></p>
+        <select name="Proc" required>
+            <option value="">Выберите процессор</option>
+            {% for proc in components_by_category['Процессор'] %}
+                <option value="{{ proc }}" {% if build.Proc == proc %}selected{% endif %}>{{ proc }}</option>
+            {% endfor %}
+        </select>
+        
+        <p><strong>Материнская плата:</strong></p>
+        <select name="MPlata" required>
+            <option value="">Выберите материнскую плату</option>
+            {% for mplata in components_by_category['Материнская плата'] %}
+                <option value="{{ mplata }}" {% if build.MPlata == mplata %}selected{% endif %}>{{ mplata }}</option>
+            {% endfor %}
+        </select>
+        
+        <p><strong>Кулер:</strong></p>
+        <select name="CW" required>
+            <option value="">Выберите систему охлаждения</option>
+            {% if 'Кулер' in components_by_category %}
+                {% for cooler in components_by_category['Кулер'] %}
+                    <option value="{{ cooler }}" {% if build.CW == cooler %}selected{% endif %}>{{ cooler }}</option>
+                {% endfor %}
+            {% else %}
+                <option value="">Нет доступных кулеров</option>
+            {% endif %}
+        </select>
+        
+        <p><strong>Оперативная память:</strong></p>
+        <select name="RAM" required>
+            <option value="">Выберите оперативную память</option>
+            {% for ram in components_by_category['Оперативная память'] %}
+                <option value="{{ ram }}" {% if build.RAM == ram %}selected{% endif %}>{{ ram }}</option>
+            {% endfor %}
+        </select>
+        
+        <p><strong>Видеокарта:</strong></p>
+        <select name="VideoCard" required>
+            <option value="">Выберите видеокарту</option>
+            {% for vcard in components_by_category['Видеокарта'] %}
+                <option value="{{ vcard }}" {% if build.VideoCard == vcard %}selected{% endif %}>{{ vcard }}</option>
+            {% endfor %}
+        </select>
+        
+        <p><strong>Блок питания:</strong></p>
+        <select name="BP" required>
+            <option value="">Выберите блок питания</option>
+            {% for bp in components_by_category['Блок питания'] %}
+                <option value="{{ bp }}" {% if build.BP == bp %}selected{% endif %}>{{ bp }}</option>
+            {% endfor %}
+        </select>
+        
+        <p><strong>Корпус:</strong></p>
+        <select name="Corpus" required>
+            <option value="">Выберите корпус</option>
+            {% for corpus in components_by_category['Корпус'] %}
+                <option value="{{ corpus }}" {% if build.Corpus == corpus %}selected{% endif %}>{{ corpus }}</option>
+            {% endfor %}
+        </select>
+        
+        <br><br>
+        <button type="submit">Сохранить изменения</button>
+        <a href="{{ url_for('admin_panel') }}">Отмена</a>
+    </form>
+</body>
+</html>

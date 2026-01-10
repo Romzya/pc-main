@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Собери компьютер на заказ</title>
+</head>
+<body>
+    <h1>Собери компьютер на заказ</h1>
+    <p>Пользователь: {{ username }} | <a href="{{ url_for('logout') }}">Выйти</a></p>
+    
+    <!-- Отображение flash сообщений -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div>
+                {% for category, message in messages %}
+                    <div style="padding: 10px; margin: 10px 0; border-radius: 5px;
+                               {% if category == 'error' %}background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;{% endif %}
+                               {% if category == 'success' %}background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;{% endif %}
+                               {% if category == 'warning' %}background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    {% if is_admin %}
+        <p><a href="{{ url_for('admin_panel') }}">Админ-панель</a></p>
+    {% endif %}
+    
+    <h2>Добавить новую сборку</h2>
+    
+    <form action="{{ url_for('add_password') }}" method="POST">
+        <!-- Процессор -->
+        <div>
+            <label>Процессор:</label><br>
+            <select name="Proc" id="procSelect" required onchange="showInfo('proc')">
+                <option value="">Выберите процессор</option>
+                {% if components_by_category and components_by_category.get('Процессор') %}
+                    {% for proc in components_by_category.get('Процессор') %}
+                        <option value="{{ proc.name }}" 
+                                data-description="{{ proc.description or '' }}"
+                                data-price="{{ proc.price or 0 }}"
+                                data-socket="{{ proc.socket or '' }}">
+                            {{ proc.name }}{% if proc.socket %} ({{ proc.socket }}){% endif %}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступных процессоров</option>
+                {% endif %}
+            </select>
+            <div id="proc-info"></div>
+        </div>
+        
+        <!-- Материнская плата -->
+        <div>
+            <label>Материнская плата:</label><br>
+            <select name="MPlata" id="mplataSelect" required onchange="showInfo('mplata'); checkCompatibility()">
+                <option value="">Выберите материнскую плату</option>
+                {% if components_by_category and components_by_category.get('Материнская плата') %}
+                    {% for mplata in components_by_category.get('Материнская плата') %}
+                        <option value="{{ mplata.name }}" 
+                                data-description="{{ mplata.description or '' }}"
+                                data-price="{{ mplata.price or 0 }}"
+                                data-socket="{{ mplata.socket or '' }}">
+                            {{ mplata.name }}{% if mplata.socket %} ({{ mplata.socket }}){% endif %}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступных материнских плат</option>
+                {% endif %}
+            </select>
+            <div id="mplata-info"></div>
+        </div>
+        
+        <!-- Система охлаждения -->
+        <div>
+            <label>Система охлаждения:</label><br>
+            <select name="CW" id="cwSelect" required onchange="showInfo('cw')">
+                <option value="">Выберите систему охлаждения</option>
+                {% if components_by_category and components_by_category.get('Кулер') %}
+                    {% for cw in components_by_category.get('Кулер') %}
+                        <option value="{{ cw.name }}" 
+                                data-description="{{ cw.description or '' }}"
+                                data-price="{{ cw.price or 0 }}"
+                                data-socket="{{ cw.socket or '' }}">
+                            {{ cw.name }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступных систем охлаждения</option>
+                {% endif %}
+            </select>
+            <div id="cw-info"></div>
+        </div>
+        
+        <!-- Оперативная память -->
+        <div>
+            <label>Оперативная память:</label><br>
+            <select name="RAM" id="ramSelect" required onchange="showInfo('ram')">
+                <option value="">Выберите оперативную память</option>
+                {% if components_by_category and components_by_category.get('Оперативная память') %}
+                    {% for ram in components_by_category.get('Оперативная память') %}
+                        <option value="{{ ram.name }}" 
+                                data-description="{{ ram.description or '' }}"
+                                data-price="{{ ram.price or 0 }}">
+                            {{ ram.name }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступной оперативной памяти</option>
+                {% endif %}
+            </select>
+            <div id="ram-info"></div>
+        </div>
+        
+        <!-- Видеокарта -->
+        <div>
+            <label>Видеокарта:</label><br>
+            <select name="VideoCard" id="videocardSelect" required onchange="showInfo('videocard')">
+                <option value="">Выберите видеокарту</option>
+                {% if components_by_category and components_by_category.get('Видеокарта') %}
+                    {% for vcard in components_by_category.get('Видеокарта') %}
+                        <option value="{{ vcard.name }}" 
+                                data-description="{{ vcard.description or '' }}"
+                                data-price="{{ vcard.price or 0 }}">
+                            {{ vcard.name }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступных видеокарт</option>
+                {% endif %}
+            </select>
+            <div id="videocard-info"></div>
+        </div>
+        
+        <!-- Блок питания -->
+        <div>
+            <label>Блок питания:</label><br>
+            <select name="BP" id="bpSelect" required onchange="showInfo('bp')">
+                <option value="">Выберите блок питания</option>
+                {% if components_by_category and components_by_category.get('Блок питания') %}
+                    {% for bp in components_by_category.get('Блок питания') %}
+                        <option value="{{ bp.name }}" 
+                                data-description="{{ bp.description or '' }}"
+                                data-price="{{ bp.price or 0 }}">
+                            {{ bp.name }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступных блоков питания</option>
+                {% endif %}
+            </select>
+            <div id="bp-info"></div>
+        </div>
+        
+        <!-- Корпус -->
+        <div>
+            <label>Корпус:</label><br>
+            <select name="Corpus" id="corpusSelect" required onchange="showInfo('corpus')">
+                <option value="">Выберите корпус</option>
+                {% if components_by_category and components_by_category.get('Корпус') %}
+                    {% for corpus in components_by_category.get('Корпус') %}
+                        <option value="{{ corpus.name }}" 
+                                data-description="{{ corpus.description or '' }}"
+                                data-price="{{ corpus.price or 0 }}">
+                            {{ corpus.name }}
+                        </option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Нет доступных корпусов</option>
+                {% endif %}
+            </select>
+            <div id="corpus-info"></div>
+        </div>
+        
+        <!-- Блок для отображения совместимости -->
+        <div id="compatibilityResult" style="margin: 15px 0;"></div>
+        
+        <h2>Вниматлено проверайте совместимость сокетов: LGA()+intel | AM()+ryzen
+        </h2>
+
+        <button type="submit">Добавить сборку</button>
+    </form>
+    
+    <!-- СЕКЦИЯ МОИХ СБОРОК -->
+    <div style="margin-top: 40px;">
+        <h2>Мои сборки</h2>
+        
+        {% if passwords %}
+            <p>Общая стоимость всех сборок: {{ "%.2f"|format(total_user_price) if total_user_price else 0 }} руб.</p>
+            
+            {% for item in passwords %}
+            <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                <div><strong>Сборка #{{ item.id }}</strong></div>
+                <div>Процессор: {{ item.Proc }}</div>
+                <div>Материнская плата: {{ item.MPlata }}</div>
+                <div>Система охлаждения: {{ item.CW }}</div>
+                <div>Оперативная память: {{ item.RAM }}</div>
+                <div>Видеокарта: {{ item.VideoCard }}</div>
+                <div>Блок питания: {{ item.BP }}</div>
+                <div>Корпус: {{ item.Corpus }}</div>
+                <div><strong>Итоговая стоимость: {{ "%.2f"|format(item.total_price) if item.total_price else 0 }} руб.</strong></div>
+                
+                <!-- Статус и ссылка на чат -->
+                {% if get_build_status %}
+                    {% set build_status = get_build_status(item.id) %}
+                    {% if build_status and build_status.needs_approval == 1 %}
+                    <div style="color: orange; margin: 10px 0;">⚠️ <strong>Ожидает согласования администратором</strong></div>
+                    {% endif %}
+                {% endif %}
+                
+                <div style="margin-top: 10px;">
+                    <a href="{{ url_for('build_chat', build_id=item.id) }}">Обсудить с администратором</a>
+                    | <a href="{{ url_for('delete_password', password_id=item.id) }}" 
+                         onclick="return confirm('Удалить сборку #{{ item.id }}?')">Удалить</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="padding: 20px; text-align: center; color: #666;">
+                Нет сохраненных сборок. Создайте первую!
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; text-align: center; padding: 10px;">
+        © 2025 Петров ЙОУ
+    </div>
+
+    <script>
+        // Функция для отображения информации о выбранном компоненте
+        function showInfo(type) {
+            const select = document.getElementById(type + 'Select');
+            const infoDiv = document.getElementById(type + '-info');
+            
+            if (!select || !infoDiv) return;
+            
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                const description = selectedOption.getAttribute('data-description') || '';
+                const price = selectedOption.getAttribute('data-price') || '0';
+                
+                let html = '';
+                if (description) {
+                    html += description + '<br>';
+                }
+                if (price && parseFloat(price) > 0) {
+                    html += 'Цена: ' + parseFloat(price).toLocaleString('ru-RU') + ' руб.';
+                }
+                
+                infoDiv.innerHTML = html;
+            } else {
+                infoDiv.innerHTML = '';
+            }
+        }
+        
+        // Функция проверки совместимости
+        function checkCompatibility() {
+            const procSelect = document.getElementById('procSelect');
+            const mplataSelect = document.getElementById('mplataSelect');
+            const resultDiv = document.getElementById('compatibilityResult');
+            
+            if (!procSelect || !mplataSelect || !resultDiv) return;
+            
+            const cpu = procSelect.value;
+            const mb = mplataSelect.value;
+            
+            if (!cpu || !mb) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+            
+            const cpuOption = procSelect.options[procSelect.selectedIndex];
+            const mbOption = mplataSelect.options[mplataSelect.selectedIndex];
+            
+            const cpuSocket = cpuOption.getAttribute('data-socket') || '';
+            const mbSocket = mbOption.getAttribute('data-socket') || '';
+            
+            if (!cpuSocket || !mbSocket) {
+                resultDiv.innerHTML = '<div></div>';
+                return;
+            }
+            
+            // Проверка совместимости
+            const isIntelCPU = cpuSocket.includes('LGA');
+            const isAMDCPU = cpuSocket.includes('AM');
+            const isIntelMB = mbSocket.includes('LGA');
+            const isAMDMB = mbSocket.includes('AM');
+            
+            if ((isIntelCPU && isAMDMB) || (isAMDCPU && isIntelMB)) {
+                resultDiv.innerHTML = `<div style="color: red; font-weight: bold; padding: 10px; background: #ffe6e6; border: 1px solid red;">
+                    ✗ НЕСОВМЕСТИМО! Процессор с сокетом ${cpuSocket} не работает с материнской платой ${mbSocket}
+                </div>`;
+            } else if ((isIntelCPU && isIntelMB) || (isAMDCPU && isAMDMB)) {
+                resultDiv.innerHTML = `<div style="color: green; font-weight: bold; padding: 10px; background: #e6ffe6; border: 1px solid green;">
+                    ✓ Совместимо: ${cpuSocket} + ${mbSocket}
+                </div>`;
+            } else {
+                resultDiv.innerHTML = `<div style="color: blue; padding: 10px; background: #e6f3ff; border: 1px solid blue;">
+                    ℹ️ Сокеты: CPU=${cpuSocket}, MB=${mbSocket}
+                </div>`;
+            }
+        }
+        
+        // Добавляем обработчики событий
+        document.addEventListener('DOMContentLoaded', function() {
+            const procSelect = document.getElementById('procSelect');
+            const mplataSelect = document.getElementById('mplataSelect');
+            
+            if (procSelect) {
+                procSelect.addEventListener('change', function() {
+                    showInfo('proc');
+                    checkCompatibility();
+                });
+            }
+            
+            if (mplataSelect) {
+                mplataSelect.addEventListener('change', function() {
+                    showInfo('mplata');
+                    checkCompatibility();
+                });
+            }
+            
+            // Инициализация для других полей
+            const otherFields = ['cw', 'ram', 'videocard', 'bp', 'corpus'];
+            otherFields.forEach(field => {
+                const select = document.getElementById(field + 'Select');
+                if (select) {
+                    select.addEventListener('change', function() {
+                        showInfo(field);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
