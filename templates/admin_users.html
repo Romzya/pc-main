@@ -4,53 +4,493 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Управление пользователями</title>
+    <style>
+        /* Основные стили темы сборки ПК */
+        :root {
+            --primary: #2a5c9e;
+            --primary-dark: #1a3a6e;
+            --secondary: #00a8ff;
+            --accent: #00ffaa;
+            --dark: #0a0f1a;
+            --darker: #050811;
+            --light: #f0f4f8;
+            --gray: #2d3748;
+            --gray-light: #4a5568;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --danger: #e53e3e;
+            --info: #3182ce;
+            --tech-gradient: linear-gradient(135deg, #1a3a6e 0%, #2a5c9e 50%, #00a8ff 100%);
+            --card-bg: rgba(26, 32, 44, 0.8);
+            --border-color: rgba(0, 168, 255, 0.2);
+            --shadow-tech: 0 4px 20px rgba(0, 168, 255, 0.15);
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.3);
+            --glow: 0 0 15px rgba(0, 255, 170, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--darker);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(42, 92, 158, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 168, 255, 0.1) 0%, transparent 20%),
+                linear-gradient(to bottom, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Шапка */
+        header {
+            background: var(--tech-gradient);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-tech), var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        h2 {
+            color: var(--secondary);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Навигация */
+        .nav-bar {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-tech);
+        }
+
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            background: rgba(0, 168, 255, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: rgba(0, 168, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 168, 255, 0.2);
+        }
+
+        .nav-link.active {
+            background: var(--tech-gradient);
+            color: white;
+        }
+
+        /* Таблица */
+        .users-table {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            margin-top: 20px;
+        }
+
+        .users-table thead {
+            background: var(--tech-gradient);
+        }
+
+        .users-table th {
+            padding: 18px 15px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .users-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .users-table tbody tr:hover {
+            background: rgba(0, 168, 255, 0.05);
+        }
+
+        .users-table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        /* Бейджи */
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .role-admin {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .role-user {
+            background: rgba(0, 168, 255, 0.1);
+            color: var(--secondary);
+        }
+
+        .count-badge {
+            background: linear-gradient(135deg, var(--success), #2d8b5a);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Кнопки действий */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-delete {
+            background: linear-gradient(135deg, #c53030, var(--danger));
+            color: white;
+        }
+
+        .action-delete:hover {
+            background: linear-gradient(135deg, #9b2c2c, #fc8181);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+        }
+
+        .action-disabled {
+            background: var(--gray);
+            color: var(--gray-light);
+            cursor: not-allowed;
+        }
+
+        /* Карточки статистики */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-tech);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray-light);
+            font-size: 0.95rem;
+        }
+
+        /* Сообщения */
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.15), rgba(39, 111, 191, 0.1));
+            border-color: var(--info);
+            color: #bee3f8;
+        }
+
+        /* Футер */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            text-align: center;
+            color: var(--gray-light);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-link {
+                justify-content: center;
+            }
+            
+            .users-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-light);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Управление пользователями</h1>
-    <div>
-        <a href="{{ url_for('index') }}">На главную</a> | 
-        <a href="{{ url_for('admin_panel') }}">Все сборки</a> |
-        <a href="{{ url_for('admin_users') }}">Пользователи</a> |
-        <a href="{{ url_for('manage_components_page') }}">Управление комплектующими</a> |
-        <a href="{{ url_for('logout') }}">Выйти</a>
+    <div class="container">
+        <!-- Шапка -->
+        <header>
+            <h1>👥 Управление пользователями</h1>
+        </header>
+
+        <!-- Навигация -->
+        <div class="nav-bar">
+            <a href="{{ url_for('index') }}" class="nav-link">🏠 На главную</a>
+            <a href="{{ url_for('admin_panel') }}" class="nav-link">📊 Все сборки</a>
+            <a href="{{ url_for('admin_users') }}" class="nav-link active">👥 Пользователи</a>
+            <a href="{{ url_for('manage_components_page') }}" class="nav-link">🛠️ Управление комплектующими</a>
+            <a href="{{ url_for('logout') }}" class="nav-link">🚪 Выйти</a>
+        </div>
+
+        <!-- Статистика -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number">{{ users|length if users else 0 }}</div>
+                <div class="stat-label">Всего пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👑</div>
+                <div class="stat-number">{{ admin_count if admin_count else 0 }}</div>
+                <div class="stat-label">Администраторов</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🖥️</div>
+                <div class="stat-number">{{ total_builds if total_builds else 0 }}</div>
+                <div class="stat-label">Всего сборок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-number">{{ avg_builds_per_user if avg_builds_per_user else 0 }}</div>
+                <div class="stat-label">Сборок на пользователя</div>
+            </div>
+        </div>
+
+        <!-- Список пользователей -->
+        <h2>📋 Список пользователей</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'error' }}">
+                        {% if category == 'success' %}✅{% elif category == 'error' %}❌{% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if users %}
+        <div style="overflow-x: auto;">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя пользователя</th>
+                        <th>Номер телефона</th>
+                        <th>Кол-во сборок</th>
+                        <th>Роль</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td><strong>#{{ user.id }}</strong></td>
+                        <td>{{ user.username }}</td>
+                        <td>
+                            {% if user.TP %}
+                            📱 {{ user.TP }}
+                            {% else %}
+                            <span style="color: var(--gray-light);">Не указан</span>
+                            {% endif %}
+                        </td>
+                        <td align="center">
+                            <span class="count-badge">{{ user.build_count }}</span>
+                        </td>
+                        <td>
+                            {% if user.is_admin %}
+                            <span class="role-badge role-admin">👑 Администратор</span>
+                            {% else %}
+                            <span class="role-badge role-user">👤 Пользователь</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not user.is_admin %}
+                            <a href="{{ url_for('delete_user', user_id=user.id) }}" 
+                               onclick="return confirm('Вы уверены, что хотите удалить пользователя \"{{ user.username }}\" и все его сборки?')" 
+                               class="action-btn action-delete">
+                                🗑️ Удалить
+                            </a>
+                            {% else %}
+                            <span class="action-btn action-disabled">⚠️ Защищено</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👤</div>
+            <h3>Пользователей нет</h3>
+            <p>В системе пока не зарегистрировано ни одного пользователя</p>
+        </div>
+        {% endif %}
+
+        <!-- Футер -->
+        <footer>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div style="color: var(--accent); font-weight: 600;">🖥️ PC Builder Pro</div>
+                <div>© 2025 Панель администратора | Управление пользователями</div>
+                <div style="color: var(--secondary);">Версия 2.0</div>
+            </div>
+        </footer>
     </div>
-    
-    <h2>Список пользователей:</h2>
-    
-    {% if users %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Имя пользователя</th>
-                <th>Номер телефона</th>
-                <th>Кол-во сборок</th>
-                <th>Роль</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.TP }}</td>
-                <td>{{ user.build_count }}</td>
-                <td>{% if user.is_admin %}Администратор{% else %}Пользователь{% endif %}</td>
-                <td>
-                    {% if not user.is_admin %}
-                    <a href="{{ url_for('delete_user', user_id=user.id) }}" 
-                       onclick="return confirm('Удалить пользователя {{ user.username }} и все его сборки?')">Удалить</a>
-                    {% else %}
-                    <span>Нельзя удалить</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Нет пользователей</p>
-    {% endif %}
+
+    <script>
+        // Подтверждение удаления пользователя
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteLinks = document.querySelectorAll('.action-delete');
+            deleteLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const username = this.closest('tr').querySelector('td:nth-child(2)').textContent;
+                    if (!confirm(`Вы уверены, что хотите удалить пользователя "${username}"?\n\nЭто действие удалит все сборки пользователя и не может быть отменено.`)) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

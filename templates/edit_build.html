@@ -29,15 +29,15 @@
             {% endfor %}
         </select>
         
-        <p><strong>Кулер:</strong></p>
+        <p><strong>Система охлаждения:</strong></p>
         <select name="CW" required>
             <option value="">Выберите систему охлаждения</option>
-            {% if 'Кулер' in components_by_category %}
-                {% for cooler in components_by_category['Кулер'] %}
+            {% if 'Система охлаждения' in components_by_category %}
+                {% for cooler in components_by_category['Система охлаждения'] %}
                     <option value="{{ cooler }}" {% if build.CW == cooler %}selected{% endif %}>{{ cooler }}</option>
                 {% endfor %}
             {% else %}
-                <option value="">Нет доступных кулеров</option>
+                <option value="">Нет доступной системы охлаждения</option>
             {% endif %}
         </select>
         

@@ -4,6 +4,324 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админ-панель</title>
+    <style>
+    :root {
+        --primary: #2a5c9e;
+        --primary-dark: #1a3a6e;
+        --secondary: #00a8ff;
+        --accent: #00ffaa;
+        --dark: #0a0f1a;
+        --darker: #050811;
+        --light: #f0f4f8;
+        --gray: #2d3748;
+        --gray-light: #4a5568;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --danger: #e53e3e;
+        --info: #3182ce;
+        --tech-gradient: linear-gradient(135deg, #1a3a6e 0%, #2a5c9e 50%, #00a8ff 100%);
+        --card-bg: rgba(26, 32, 44, 0.8);
+        --border-color: rgba(0, 168, 255, 0.2);
+        --shadow-tech: 0 4px 20px rgba(0, 168, 255, 0.15);
+        --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.3);
+        --glow: 0 0 15px rgba(0, 255, 170, 0.3);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--darker);
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(42, 92, 158, 0.15) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(0, 168, 255, 0.1) 0%, transparent 20%),
+            linear-gradient(to bottom, var(--darker), var(--dark));
+        color: var(--light);
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 25px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(90deg, #fff, var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 800;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    h2 {
+        color: var(--secondary);
+        font-size: 1.8rem;
+        margin: 30px 0 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Навигация */
+    div:first-of-type {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+
+    div:first-of-type a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: rgba(0, 255, 170, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    div:first-of-type a:hover {
+        background: rgba(0, 255, 170, 0.2);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-tech);
+    }
+
+    /* Статистика */
+    div:nth-of-type(2) {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+    }
+
+    div:nth-of-type(2) p {
+        margin: 15px 0;
+        padding: 12px 20px;
+        background: rgba(13, 20, 33, 0.7);
+        border-radius: 8px;
+        border-left: 4px solid var(--secondary);
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    div:nth-of-type(2) strong {
+        color: var(--accent);
+        min-width: 250px;
+        display: inline-block;
+    }
+
+    /* Таблица */
+    table {
+        width: 100%;
+        background: var(--card-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--border-color);
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    thead {
+        background: var(--tech-gradient);
+    }
+
+    th {
+        padding: 18px 15px;
+        text-align: left;
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    tbody tr:hover {
+        background: rgba(0, 168, 255, 0.05);
+    }
+
+    td {
+        padding: 15px;
+        vertical-align: middle;
+    }
+
+    /* Статусы */
+    td:nth-child(12) {
+        color: var(--warning);
+        font-weight: 600;
+    }
+
+    td:nth-child(12):contains("✅") {
+        color: var(--success);
+    }
+
+    /* Действия */
+    td:last-child {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    td:last-child a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    td:last-child a:nth-child(1) {
+        background: rgba(49, 130, 206, 0.7);
+    }
+
+    td:last-child a:nth-child(2) {
+        background: rgba(214, 158, 46, 0.7);
+    }
+
+    td:last-child a:nth-child(3) {
+        background: rgba(229, 62, 62, 0.7);
+    }
+
+    td:last-child a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    td:last-child a:nth-child(1):hover {
+        background: var(--info);
+    }
+
+    td:last-child a:nth-child(2):hover {
+        background: var(--warning);
+    }
+
+    td:last-child a:nth-child(3):hover {
+        background: var(--danger);
+    }
+
+    /* Цена */
+    td:nth-child(11) {
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    /* Сообщение "Нет сборок" */
+    p:contains("Нет сборок") {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--gray-light);
+        font-size: 1.2rem;
+        background: var(--card-bg);
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 2px dashed var(--border-color);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 1200px) {
+        table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+        
+        div:first-of-type {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        div:first-of-type a {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        td:last-child {
+            flex-direction: column;
+        }
+        
+        div:nth-of-type(2) strong {
+            min-width: 200px;
+        }
+    }
+
+    /* Анимации */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    table, div:nth-of-type(2), div:first-of-type {
+        animation: fadeIn 0.5s ease;
+    }
+
+    /* Иконки в навигации */
+    div:first-of-type a::before {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    div:first-of-type a:first-child::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ffaa'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/%3E%3C/svg%3E");
+    }
+
+    div:first-of-type a:nth-child(2)::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ffaa'%3E%3Cpath d='M22 9L12 2 2 9h4v11h12V9h4z'/%3E%3C/svg%3E");
+    }
+
+    div:first-of-type a:nth-child(3)::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ffaa'%3E%3Cpath d='M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z'/%3E%3C/svg%3E");
+    }
+
+    div:first-of-type a:nth-child(4)::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ffaa'%3E%3Cpath d='M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'/%3E%3C/svg%3E");
+    }
+
+    div:first-of-type a:last-child::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300ffaa'%3E%3Cpath d='M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z'/%3E%3C/svg%3E");
+    }
+</style>
 </head>
 <body>
     <h1>Админ-панель</h1>

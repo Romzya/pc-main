@@ -4,6 +4,363 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат по сборке #{{ build.id }}</title>
+    <style>
+    :root {
+        --primary: #2a5c9e;
+        --primary-dark: #1a3a6e;
+        --secondary: #00a8ff;
+        --accent: #00ffaa;
+        --dark: #0a0f1a;
+        --darker: #050811;
+        --light: #f0f4f8;
+        --gray: #2d3748;
+        --gray-light: #4a5568;
+        --success: #38a169;
+        --warning: #d69e2e;
+        --danger: #e53e3e;
+        --info: #3182ce;
+        --tech-gradient: linear-gradient(135deg, #1a3a6e 0%, #2a5c9e 50%, #00a8ff 100%);
+        --card-bg: rgba(26, 32, 44, 0.8);
+        --border-color: rgba(0, 168, 255, 0.2);
+        --shadow-tech: 0 4px 20px rgba(0, 168, 255, 0.15);
+        --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.3);
+        --glow: 0 0 15px rgba(0, 255, 170, 0.3);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--darker);
+        background-image: 
+            radial-gradient(circle at 10% 20%, rgba(42, 92, 158, 0.15) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(0, 168, 255, 0.1) 0%, transparent 20%),
+            linear-gradient(to bottom, var(--darker), var(--dark));
+        color: var(--light);
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 25px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(90deg, #fff, var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 800;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    h3 {
+        color: var(--secondary);
+        font-size: 1.5rem;
+        margin: 25px 0 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Навигация */
+    div:first-of-type {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+
+    div:first-of-type a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: rgba(0, 255, 170, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    div:first-of-type a:hover {
+        background: rgba(0, 255, 170, 0.2);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-tech);
+    }
+
+    /* Информация о сборке */
+    div:nth-of-type(2) {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+    }
+
+    div:nth-of-type(2) p {
+        margin: 12px 0;
+        padding: 10px 15px;
+        background: rgba(13, 20, 33, 0.7);
+        border-radius: 8px;
+        border-left: 3px solid var(--secondary);
+    }
+
+    div:nth-of-type(2) strong {
+        color: var(--accent);
+        min-width: 200px;
+        display: inline-block;
+    }
+
+    /* Блок согласования */
+    div:nth-of-type(2) > div {
+        background: linear-gradient(135deg, rgba(214, 158, 46, 0.15), rgba(180, 138, 56, 0.1));
+        border: 1px solid var(--warning);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    div:nth-of-type(2) > div strong {
+        color: var(--warning);
+        font-size: 1.1rem;
+    }
+
+    /* Формы */
+    form {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+        border-radius: 12px;
+        margin: 25px 0;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+    }
+
+    textarea {
+        width: 100%;
+        padding: 15px;
+        background: rgba(13, 20, 33, 0.9);
+        border: 2px solid var(--gray);
+        border-radius: 8px;
+        color: var(--light);
+        font-size: 1rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 100px;
+        transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.2);
+    }
+
+    /* Кнопки */
+    button {
+        background: var(--tech-gradient);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: var(--shadow-tech);
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 168, 255, 0.3);
+        background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+    }
+
+    /* Ссылка редактирования */
+    a[href*="edit_build"] {
+        background: linear-gradient(135deg, var(--warning), #b5892d);
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-tech);
+    }
+
+    a[href*="edit_build"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(214, 158, 46, 0.3);
+    }
+
+    /* Чат сообщения */
+    div > div:last-of-type {
+        background: var(--card-bg);
+        backdrop-filter: blur(10px);
+        padding: 25px;
+        border-radius: 12px;
+        margin: 25px 0;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    div > div:last-of-type > div {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(13, 20, 33, 0.7);
+        border-radius: 10px;
+        border-left: 4px solid var(--secondary);
+    }
+
+    div > div:last-of-type > div:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Заголовок сообщения */
+    div > div:last-of-type > div > div:first-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    strong {
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    strong:contains("Вы") {
+        color: var(--success);
+    }
+
+    small {
+        color: var(--gray-light);
+        font-size: 0.9rem;
+    }
+
+    /* Текст сообщения */
+    div > div:last-of-type > div > div:last-child {
+        line-height: 1.5;
+        color: #e2e8f0;
+    }
+
+    /* Нет сообщений */
+    p:contains("Нет сообщений") {
+        text-align: center;
+        padding: 40px;
+        color: var(--gray-light);
+        font-size: 1.1rem;
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+    }
+
+    /* Иконки администратора */
+    strong:before {
+        content: '';
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    strong:contains("(Вы)")::after {
+        content: '👤';
+        margin-left: 5px;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2rem;
+        }
+        
+        div:first-of-type {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        div:first-of-type a {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        div:nth-of-type(2) > div {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        div:nth-of-type(2) strong {
+            min-width: 150px;
+        }
+        
+        div > div:last-of-type > div > div:first-child {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+    }
+
+    /* Анимации */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    div, form {
+        animation: slideIn 0.4s ease;
+    }
+
+    /* Стили для новых сообщений */
+    div > div:last-of-type > div:nth-last-child(1),
+    div > div:last-of-type > div:nth-last-child(2),
+    div > div:last-of-type > div:nth-last-child(3) {
+        animation: slideIn 0.3s ease;
+    }
+</style>
 </head>
 <body>
     <h1>Чат по сборке #{{ build.id }}</h1>
